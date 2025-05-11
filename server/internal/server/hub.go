@@ -7,11 +7,29 @@ import (
 	"server/pkg/packets"
 )
 
+type ClientStateHandler interface {
+	Name() string
+	SetClient(client ClientInterfacer)
+
+	OnEnter()
+	HandleMessage(senderId uint64, message packets.Msg)
+
+	OnExit()
+}
+
+/*
+func (c ClientStateHandler) OnEnter() {
+	panic("unimplemented")
+}
+*/
+
 type ClientInterfacer interface {
 	Id() uint64
 	ProcessMessage(senderId uint64, message packets.Msg)
 
 	Initialize(id uint64)
+
+	SetState(newState ClientStateHandler)
 
 	SocketSend(message packets.Msg)
 
@@ -56,7 +74,6 @@ func (h *Hub) Run() {
 		case client := <-h.UnregisterChan:
 			h.Clients.Remove(client.Id())
 		case packet := <-h.BroadcastChan:
-			//for id, client := range h.Clients {
 			h.Clients.ForEach(func(clientId uint64, client ClientInterfacer) {
 				if clientId != packet.SenderId {
 					client.ProcessMessage(packet.SenderId, packet.Msg)

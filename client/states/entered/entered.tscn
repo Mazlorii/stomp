@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://b3dxqtoki0l4v"]
+
+[ext_resource type="Script" uid="uid://cefcxkqv3katk" path="res://states/entered/entered.gd" id="1_ltgjr"]
+[ext_resource type="Script" uid="uid://dxxe6fjg8sij1" path="res://classes/log/log.gd" id="2_cjx30"]
+
+[node name="Entered" type="Node"]
+script = ExtResource("1_ltgjr")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Log" type="RichTextLabel" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_cjx30")
+metadata/_custom_type_script = "uid://dxxe6fjg8sij1"
