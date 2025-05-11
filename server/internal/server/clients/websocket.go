@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"server/internal/server"
 	"server/pkg/packets"
 
@@ -47,29 +48,34 @@ func (c *WebSocketClient) Id() uint64 {
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, message packets.Msg) {
-
+	if senderId == c.id {
+		c.Broadcast(message)
+	} else {
+		c.SocketSendAs(message, senderId)
+	}
 }
 
 func (c *WebSocketClient) Initialize(id uint64) {
 	c.id = id
-	c.logger.SetPrefix(fmt.Sprintf("Client %d", c.id))
+	c.logger.SetPrefix(fmt.Sprintf("Client %d: ", c.id))
+	c.SocketSend(packets.NewId(c.id))
+	c.logger.Printf("Sent ID to client")
 }
 
 func (c *WebSocketClient) SocketSend(message packets.Msg) {
 	c.SocketSendAs(message, c.id)
-
 }
 
 func (c *WebSocketClient) SocketSendAs(message packets.Msg, senderId uint64) {
 	select {
 	case c.sendChan <- &packets.Packet{SenderId: senderId, Msg: message}:
 	default:
-		c.logger.Printf("Send chanell full, dropping message: %T", message)
+		c.logger.Printf("Client %d send channel full, dropping message: %T", c.id, message)
 	}
 }
 
-func (c *WebSocketClient) PassToPeer(message packets.Msg, peerrId uint64) {
-	if peer, exist := c.hub.Clients[peerrId]; exist {
+func (c *WebSocketClient) PassToPeer(message packets.Msg, peerId uint64) {
+	if peer, exists := c.hub.Clients.Get(peerId); exists {
 		peer.ProcessMessage(c.id, message)
 	}
 }
@@ -81,21 +87,22 @@ func (c *WebSocketClient) Broadcast(message packets.Msg) {
 func (c *WebSocketClient) ReadPump() {
 	defer func() {
 		c.logger.Println("Closing read pump")
-		c.Close("Read pump closed")
+		c.Close("read pump closed")
 	}()
 
 	for {
 		_, data, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				c.logger.Println("error: %w", err)
+				c.logger.Printf("error: %v", err)
 			}
 			break
 		}
+
 		packet := &packets.Packet{}
 		err = proto.Unmarshal(data, packet)
 		if err != nil {
-			c.logger.Printf("error unmarshal data: %v", err)
+			c.logger.Printf("error unmarshalling data: %v", err)
 			continue
 		}
 
@@ -109,8 +116,8 @@ func (c *WebSocketClient) ReadPump() {
 
 func (c *WebSocketClient) WritePump() {
 	defer func() {
-		c.logger.Println("Closing read pump")
-		c.Close("Read pump closed")
+		c.logger.Println("Closing write pump")
+		c.Close("Write pump closed")
 	}()
 
 	for packet := range c.sendChan {
@@ -122,19 +129,21 @@ func (c *WebSocketClient) WritePump() {
 
 		data, err := proto.Marshal(packet)
 		if err != nil {
-			c.logger.Printf("error marshaling %T packet, closing client: %v", packet.Msg, err)
+			c.logger.Printf("error marshalling %T packet, dropping: %v", packet.Msg, err)
 			continue
 		}
 
-		_, err = writer.Write(data)
-		if err != nil {
+		_, writeErr := writer.Write(data)
+
+		if writeErr != nil {
 			c.logger.Printf("error writing %T packet: %v", packet.Msg, err)
+			continue
 		}
 
 		writer.Write([]byte{'\n'})
 
-		if err = writer.Close(); err != nil {
-			c.logger.Printf("error closing writer for %T packet: %v", packet.Msg, err)
+		if closeErr := writer.Close(); closeErr != nil {
+			c.logger.Printf("error closing writer, dropping %T packet: %v", packet.Msg, err)
 			continue
 		}
 	}
