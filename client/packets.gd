@@ -974,6 +974,204 @@ class DenyResponseMessage:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class PlayerMessage:
+	func _init():
+		var service
+		
+		__id = PBField.new("id", PB_DATA_TYPE.UINT64, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64])
+		service = PBServiceField.new()
+		service.field = __id
+		data[__id.tag] = service
+		
+		__name = PBField.new("name", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		service = PBServiceField.new()
+		service.field = __name
+		data[__name.tag] = service
+		
+		__x = PBField.new("x", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __x
+		data[__x.tag] = service
+		
+		__y = PBField.new("y", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __y
+		data[__y.tag] = service
+		
+		__radius = PBField.new("radius", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __radius
+		data[__radius.tag] = service
+		
+		__direction = PBField.new("direction", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 6, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __direction
+		data[__direction.tag] = service
+		
+		__speed = PBField.new("speed", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 7, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __speed
+		data[__speed.tag] = service
+		
+	var data = {}
+	
+	var __id: PBField
+	func has_id() -> bool:
+		if __id.value != null:
+			return true
+		return false
+	func get_id() -> int:
+		return __id.value
+	func clear_id() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64]
+	func set_id(value : int) -> void:
+		__id.value = value
+	
+	var __name: PBField
+	func has_name() -> bool:
+		if __name.value != null:
+			return true
+		return false
+	func get_name() -> String:
+		return __name.value
+	func clear_name() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
+	func set_name(value : String) -> void:
+		__name.value = value
+	
+	var __x: PBField
+	func has_x() -> bool:
+		if __x.value != null:
+			return true
+		return false
+	func get_x() -> float:
+		return __x.value
+	func clear_x() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__x.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_x(value : float) -> void:
+		__x.value = value
+	
+	var __y: PBField
+	func has_y() -> bool:
+		if __y.value != null:
+			return true
+		return false
+	func get_y() -> float:
+		return __y.value
+	func clear_y() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__y.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_y(value : float) -> void:
+		__y.value = value
+	
+	var __radius: PBField
+	func has_radius() -> bool:
+		if __radius.value != null:
+			return true
+		return false
+	func get_radius() -> float:
+		return __radius.value
+	func clear_radius() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__radius.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_radius(value : float) -> void:
+		__radius.value = value
+	
+	var __direction: PBField
+	func has_direction() -> bool:
+		if __direction.value != null:
+			return true
+		return false
+	func get_direction() -> float:
+		return __direction.value
+	func clear_direction() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_direction(value : float) -> void:
+		__direction.value = value
+	
+	var __speed: PBField
+	func has_speed() -> bool:
+		if __speed.value != null:
+			return true
+		return false
+	func get_speed() -> float:
+		return __speed.value
+	func clear_speed() -> void:
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__speed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_speed(value : float) -> void:
+		__speed.value = value
+	
+	func _to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PackedByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PackedByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
+class PlayerDirectionMessage:
+	func _init():
+		var service
+		
+		__direction = PBField.new("direction", PB_DATA_TYPE.DOUBLE, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE])
+		service = PBServiceField.new()
+		service.field = __direction
+		data[__direction.tag] = service
+		
+	var data = {}
+	
+	var __direction: PBField
+	func has_direction() -> bool:
+		if __direction.value != null:
+			return true
+		return false
+	func get_direction() -> float:
+		return __direction.value
+	func clear_direction() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		__direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.DOUBLE]
+	func set_direction(value : float) -> void:
+		__direction.value = value
+	
+	func _to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PackedByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PackedByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class Packet:
 	func _init():
 		var service
@@ -1019,6 +1217,18 @@ class Packet:
 		service.func_ref = Callable(self, "new_deny_response")
 		data[__deny_response.tag] = service
 		
+		__player = PBField.new("player", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 8, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = __player
+		service.func_ref = Callable(self, "new_player")
+		data[__player.tag] = service
+		
+		__player_direction = PBField.new("player_direction", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 9, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = __player_direction
+		service.func_ref = Callable(self, "new_player_direction")
+		data[__player_direction.tag] = service
+		
 	var data = {}
 	
 	var __sender_id: PBField
@@ -1056,6 +1266,10 @@ class Packet:
 		data[6].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__chat.value = ChatMessage.new()
 		return __chat.value
 	
@@ -1081,6 +1295,10 @@ class Packet:
 		data[6].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__id.value = IdMessage.new()
 		return __id.value
 	
@@ -1106,6 +1324,10 @@ class Packet:
 		data[6].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__login_request.value = LoginRequestMessage.new()
 		return __login_request.value
 	
@@ -1131,6 +1353,10 @@ class Packet:
 		data[6].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__register_request.value = RegisterRequestMessage.new()
 		return __register_request.value
 	
@@ -1156,6 +1382,10 @@ class Packet:
 		data[6].state = PB_SERVICE_STATE.FILLED
 		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__ok_response.value = OkResponseMessage.new()
 		return __ok_response.value
 	
@@ -1181,8 +1411,70 @@ class Packet:
 		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[6].state = PB_SERVICE_STATE.UNFILLED
 		data[7].state = PB_SERVICE_STATE.FILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DenyResponseMessage.new()
 		return __deny_response.value
+	
+	var __player: PBField
+	func has_player() -> bool:
+		if __player.value != null:
+			return true
+		return false
+	func get_player() -> PlayerMessage:
+		return __player.value
+	func clear_player() -> void:
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_player() -> PlayerMessage:
+		__chat.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__login_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__register_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		data[8].state = PB_SERVICE_STATE.FILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = PlayerMessage.new()
+		return __player.value
+	
+	var __player_direction: PBField
+	func has_player_direction() -> bool:
+		if __player_direction.value != null:
+			return true
+		return false
+	func get_player_direction() -> PlayerDirectionMessage:
+		return __player_direction.value
+	func clear_player_direction() -> void:
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_player_direction() -> PlayerDirectionMessage:
+		__chat.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__login_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__register_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		data[9].state = PB_SERVICE_STATE.FILLED
+		__player_direction.value = PlayerDirectionMessage.new()
+		return __player_direction.value
 	
 	func _to_string() -> String:
 		return PBPacker.message_to_string(data)

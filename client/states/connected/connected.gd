@@ -19,13 +19,13 @@ func _ready() -> void:
 func _on_ws_packet_received(packet: packets.Packet) -> void:
 	var sender_id := packet.get_sender_id()
 	if packet.has_deny_response():
-		var deny_response_message := packet.get_deny_response()
-		_log.error(deny_response_message.get_reason())
+		var deny_response_msg := packet.get_deny_response()
+		_log.error(deny_response_msg.get_reason())
 	elif packet.has_ok_response():
 		_action_on_ok_received.call()
 	
 func _on_ws_connection_closed() -> void:
-	pass
+	_log.warning("Connection closed")
 	
 func _on_login_button_pressed() -> void:
 	var packet := packets.Packet.new()
