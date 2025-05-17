@@ -4,8 +4,9 @@ const packets := preload("res://packets.gd")
 const Actor := preload("res://objects/actor/actor.gd")
 const Spore := preload("res://objects/spore/spore.gd")
 
-@onready var _line_edit: LineEdit = $UI/LineEdit
-@onready var _log: Log = $UI/Log
+@onready var _line_edit: LineEdit = $UI/VBoxContainer/LineEdit
+@onready var _log: Log = $UI/VBoxContainer/Log
+@onready var _hiscores: Hiscores = $UI/VBoxContainer/Hiscores
 @onready var _world: Node2D = $World
 
 var _players: Dictionary[int, Actor]
@@ -65,21 +66,22 @@ func _handle_player_msg(sender_id: int, player_msg: packets.PlayerMessage) -> vo
 		_add_actor(actor_id, actor_name, x, y, radius, speed, is_player)
 	else:	
 		var direction := player_msg.get_direction()
-		_update_player(actor_id, actor_name, x, y, direction, radius, speed, is_player)
+		_update_actor(actor_id, actor_name, x, y, direction, radius, speed, is_player)
 
 func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float, is_player: bool) -> void:
 	var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, is_player)
 	_world.add_child(actor)
+	_set_actor_mass(actor, _rad_to_mass(radius))
 	_players[actor_id] = actor
 	
 	if is_player: 
 		actor.area_entered.connect(_on_player_area_entered)
 	
-func _update_player(actor_id: int, actor_name: String, x: float, y: float, direction: float, radius: float, speed: float, is_player: bool) -> void:
+func _update_actor(actor_id: int, actor_name: String, x: float, y: float, direction: float, radius: float, speed: float, is_player: bool) -> void:
 	var actor := _players[actor_id]
 	
-	actor.radius = radius
-	
+	_set_actor_mass(actor, _rad_to_mass(radius))
+		
 	if actor.position.distance_squared_to(Vector2(x, y)) > 100:	
 		actor.position.x = x
 		actor.position.y = y
@@ -121,6 +123,7 @@ func _rad_to_mass(radius: float) -> float:
 	
 func _set_actor_mass(actor: Actor, new_mass: float) -> void:
 	actor.radius = sqrt(new_mass / PI)
+	_hiscores.set_hiscore(actor.actor_name, roundi(new_mass))
 
 func _on_player_area_entered(area: Area2D) -> void:
 	if area is Spore:
@@ -162,4 +165,4 @@ func _remove_spore(spore: Spore) -> void:
 func _remove_player(actor: Actor) -> void:
 	_players.erase(actor.actor_id)
 	actor.queue_free()
-	
+	_hiscores.remove_hiscore(actor.actor_name)

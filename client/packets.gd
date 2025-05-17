@@ -1406,6 +1406,159 @@ class PlayerConsumedMessage:
 			return PB_ERR.PARSE_INCOMPLETE
 		return result
 	
+class HiscoreBoardRequestMessage:
+	func _init():
+		var service
+		
+	var data = {}
+	
+	func _to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PackedByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PackedByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
+class HiscoreMessage:
+	func _init():
+		var service
+		
+		__rank = PBField.new("rank", PB_DATA_TYPE.UINT64, PB_RULE.OPTIONAL, 1, true, DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64])
+		service = PBServiceField.new()
+		service.field = __rank
+		data[__rank.tag] = service
+		
+		__name = PBField.new("name", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 2, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		service = PBServiceField.new()
+		service.field = __name
+		data[__name.tag] = service
+		
+		__score = PBField.new("score", PB_DATA_TYPE.UINT64, PB_RULE.OPTIONAL, 3, true, DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64])
+		service = PBServiceField.new()
+		service.field = __score
+		data[__score.tag] = service
+		
+	var data = {}
+	
+	var __rank: PBField
+	func has_rank() -> bool:
+		if __rank.value != null:
+			return true
+		return false
+	func get_rank() -> int:
+		return __rank.value
+	func clear_rank() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		__rank.value = DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64]
+	func set_rank(value : int) -> void:
+		__rank.value = value
+	
+	var __name: PBField
+	func has_name() -> bool:
+		if __name.value != null:
+			return true
+		return false
+	func get_name() -> String:
+		return __name.value
+	func clear_name() -> void:
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__name.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
+	func set_name(value : String) -> void:
+		__name.value = value
+	
+	var __score: PBField
+	func has_score() -> bool:
+		if __score.value != null:
+			return true
+		return false
+	func get_score() -> int:
+		return __score.value
+	func clear_score() -> void:
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__score.value = DEFAULT_VALUES_3[PB_DATA_TYPE.UINT64]
+	func set_score(value : int) -> void:
+		__score.value = value
+	
+	func _to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PackedByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PackedByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
+class HiscoreBoardMessage:
+	func _init():
+		var service
+		
+		var __hiscores_default: Array[HiscoreMessage] = []
+		__hiscores = PBField.new("hiscores", PB_DATA_TYPE.MESSAGE, PB_RULE.REPEATED, 1, true, __hiscores_default)
+		service = PBServiceField.new()
+		service.field = __hiscores
+		service.func_ref = Callable(self, "add_hiscores")
+		data[__hiscores.tag] = service
+		
+	var data = {}
+	
+	var __hiscores: PBField
+	func get_hiscores() -> Array[HiscoreMessage]:
+		return __hiscores.value
+	func clear_hiscores() -> void:
+		data[1].state = PB_SERVICE_STATE.UNFILLED
+		__hiscores.value.clear()
+	func add_hiscores() -> HiscoreMessage:
+		var element = HiscoreMessage.new()
+		__hiscores.value.append(element)
+		return element
+	
+	func _to_string() -> String:
+		return PBPacker.message_to_string(data)
+		
+	func to_bytes() -> PackedByteArray:
+		return PBPacker.pack_message(data)
+		
+	func from_bytes(bytes : PackedByteArray, offset : int = 0, limit : int = -1) -> int:
+		var cur_limit = bytes.size()
+		if limit != -1:
+			cur_limit = limit
+		var result = PBPacker.unpack_message(data, bytes, offset, cur_limit)
+		if result == cur_limit:
+			if PBPacker.check_required(data):
+				if limit == -1:
+					return PB_ERR.NO_ERRORS
+			else:
+				return PB_ERR.REQUIRED_FIELDS
+		elif limit == -1 && result > 0:
+			return PB_ERR.PARSE_INCOMPLETE
+		return result
+	
 class Packet:
 	func _init():
 		var service
@@ -1487,6 +1640,24 @@ class Packet:
 		service.func_ref = Callable(self, "new_player_consumed")
 		data[__player_consumed.tag] = service
 		
+		__hiscore_board_request = PBField.new("hiscore_board_request", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 14, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = __hiscore_board_request
+		service.func_ref = Callable(self, "new_hiscore_board_request")
+		data[__hiscore_board_request.tag] = service
+		
+		__hiscore = PBField.new("hiscore", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 15, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = __hiscore
+		service.func_ref = Callable(self, "new_hiscore")
+		data[__hiscore.tag] = service
+		
+		__hiscore_board = PBField.new("hiscore_board", PB_DATA_TYPE.MESSAGE, PB_RULE.OPTIONAL, 16, true, DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE])
+		service = PBServiceField.new()
+		service.field = __hiscore_board
+		service.func_ref = Callable(self, "new_hiscore_board")
+		data[__hiscore_board.tag] = service
+		
 	var data = {}
 	
 	var __sender_id: PBField
@@ -1536,6 +1707,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__chat.value = ChatMessage.new()
 		return __chat.value
 	
@@ -1573,6 +1750,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__id.value = IdMessage.new()
 		return __id.value
 	
@@ -1610,6 +1793,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__login_request.value = LoginRequestMessage.new()
 		return __login_request.value
 	
@@ -1647,6 +1836,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__register_request.value = RegisterRequestMessage.new()
 		return __register_request.value
 	
@@ -1684,6 +1879,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__ok_response.value = OkResponseMessage.new()
 		return __ok_response.value
 	
@@ -1721,6 +1922,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__deny_response.value = DenyResponseMessage.new()
 		return __deny_response.value
 	
@@ -1758,6 +1965,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__player.value = PlayerMessage.new()
 		return __player.value
 	
@@ -1795,6 +2008,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__player_direction.value = PlayerDirectionMessage.new()
 		return __player_direction.value
 	
@@ -1832,6 +2051,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__spore.value = SporeMessage.new()
 		return __spore.value
 	
@@ -1869,6 +2094,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__spore_consumed.value = SporeConsumedMessage.new()
 		return __spore_consumed.value
 	
@@ -1906,6 +2137,12 @@ class Packet:
 		data[12].state = PB_SERVICE_STATE.FILLED
 		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__spores_batch.value = SporesBatchMessage.new()
 		return __spores_batch.value
 	
@@ -1943,8 +2180,143 @@ class Packet:
 		__spores_batch.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
 		data[12].state = PB_SERVICE_STATE.UNFILLED
 		data[13].state = PB_SERVICE_STATE.FILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
 		__player_consumed.value = PlayerConsumedMessage.new()
 		return __player_consumed.value
+	
+	var __hiscore_board_request: PBField
+	func has_hiscore_board_request() -> bool:
+		if __hiscore_board_request.value != null:
+			return true
+		return false
+	func get_hiscore_board_request() -> HiscoreBoardRequestMessage:
+		return __hiscore_board_request.value
+	func clear_hiscore_board_request() -> void:
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_hiscore_board_request() -> HiscoreBoardRequestMessage:
+		__chat.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__login_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__register_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		__spore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		__spore_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
+		__spores_batch.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
+		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
+		data[14].state = PB_SERVICE_STATE.FILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = HiscoreBoardRequestMessage.new()
+		return __hiscore_board_request.value
+	
+	var __hiscore: PBField
+	func has_hiscore() -> bool:
+		if __hiscore.value != null:
+			return true
+		return false
+	func get_hiscore() -> HiscoreMessage:
+		return __hiscore.value
+	func clear_hiscore() -> void:
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_hiscore() -> HiscoreMessage:
+		__chat.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__login_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__register_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		__spore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		__spore_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
+		__spores_batch.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
+		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		data[15].state = PB_SERVICE_STATE.FILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[16].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = HiscoreMessage.new()
+		return __hiscore.value
+	
+	var __hiscore_board: PBField
+	func has_hiscore_board() -> bool:
+		if __hiscore_board.value != null:
+			return true
+		return false
+	func get_hiscore_board() -> HiscoreBoardMessage:
+		return __hiscore_board.value
+	func clear_hiscore_board() -> void:
+		data[16].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+	func new_hiscore_board() -> HiscoreBoardMessage:
+		__chat.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[2].state = PB_SERVICE_STATE.UNFILLED
+		__id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[3].state = PB_SERVICE_STATE.UNFILLED
+		__login_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__register_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__ok_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__deny_response.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[7].state = PB_SERVICE_STATE.UNFILLED
+		__player.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[8].state = PB_SERVICE_STATE.UNFILLED
+		__player_direction.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[9].state = PB_SERVICE_STATE.UNFILLED
+		__spore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[10].state = PB_SERVICE_STATE.UNFILLED
+		__spore_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[11].state = PB_SERVICE_STATE.UNFILLED
+		__spores_batch.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[12].state = PB_SERVICE_STATE.UNFILLED
+		__player_consumed.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[13].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore_board_request.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[14].state = PB_SERVICE_STATE.UNFILLED
+		__hiscore.value = DEFAULT_VALUES_3[PB_DATA_TYPE.MESSAGE]
+		data[15].state = PB_SERVICE_STATE.UNFILLED
+		data[16].state = PB_SERVICE_STATE.FILLED
+		__hiscore_board.value = HiscoreBoardMessage.new()
+		return __hiscore_board.value
 	
 	func _to_string() -> String:
 		return PBPacker.message_to_string(data)

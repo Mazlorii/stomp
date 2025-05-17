@@ -37,6 +37,11 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Зарегестрироваться"
 
+[node name="HiscoresButton" type="Button" parent="UI/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Таблица рекордов"
+
 [node name="Log" type="RichTextLabel" parent="UI/VBoxContainer"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2

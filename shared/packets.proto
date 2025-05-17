@@ -13,18 +13,18 @@ message PlayerMessage { uint64 id = 1;
                         string name = 2; 
                         double x = 3; 
                         double y = 4; 
-                        //double z = 5; поменять цифру
                         double radius = 5; 
                         double direction = 6; 
-                        //Vector3 direction = 7;
                         double speed = 7;
-                        // int32 team = 8;  
                         }
 message PlayerDirectionMessage { double direction = 1; }
 message SporeMessage { uint64 id = 1; double x = 2; double y = 3; double radius = 4; }
 message SporeConsumedMessage { uint64 spore_id = 1; }
 message SporesBatchMessage { repeated SporeMessage spores = 1; }
 message PlayerConsumedMessage { uint64 player_id = 1; }
+message HiscoreBoardRequestMessage { }
+message HiscoreMessage { uint64 rank = 1; string name = 2; uint64 score = 3; }
+message HiscoreBoardMessage { repeated HiscoreMessage hiscores = 1; }
 
 
 message Packet {
@@ -42,6 +42,9 @@ message Packet {
         SporeConsumedMessage spore_consumed = 11;
         SporesBatchMessage spores_batch = 12;
         PlayerConsumedMessage  player_consumed = 13;
+        HiscoreBoardRequestMessage hiscore_board_request = 14;
+        HiscoreMessage hiscore = 15;
+        HiscoreBoardMessage hiscore_board = 16;
     }
 }
 

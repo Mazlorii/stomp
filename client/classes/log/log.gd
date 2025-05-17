@@ -17,5 +17,5 @@ func success(message: String) -> void:
 	_message(message, Color.LAWN_GREEN)
 
 func chat(sender_name: String, message: String) -> void:
-	_message("[color=#%s]%s[/color] [i]%s[/i]" % [Color.CORNFLOWER_BLUE.to_html(false), sender_name, message])
+	_message("[color=#%s]%s[/color] [i]%s[/i]" % [Color.WHITE_SMOKE.to_html(false), sender_name, message])
 	

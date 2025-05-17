@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"server/internal/server"
+	"server/internal/server/db"
 	"server/internal/server/objects"
 	"server/pkg/packets"
 	"time"
@@ -71,6 +72,7 @@ func (g *InGame) OnExit() {
 		g.cancelPlayerUpdateLoop()
 	}
 	g.client.SharedGameObjects().Players.Remove(g.client.Id())
+	g.syncPlayerBestScore()
 }
 
 func (g *InGame) handlePlayer(senderId uint64, message *packets.Packet_Player) {
@@ -123,12 +125,14 @@ func (g *InGame) handleSporeConsumed(senderId uint64, message *packets.Packet_Sp
 		return
 	}
 
-	sporeMass := g.radToMass(spore.Radius)
+	sporeMass := radToMass(spore.Radius)
 	g.player.Radius = g.nextRadius(sporeMass)
 
 	go g.client.SharedGameObjects().Spores.Remove(sporeId)
 
 	g.client.Broadcast(message)
+
+	go g.syncPlayerBestScore()
 }
 
 func (g *InGame) handlePlayerConsumed(senderId uint64, message *packets.Packet_PlayerConsumed) {
@@ -167,13 +171,14 @@ func (g *InGame) handlePlayerConsumed(senderId uint64, message *packets.Packet_P
 		return
 	}
 
-	otherMass := g.radToMass(other.Radius)
+	otherMass := radToMass(other.Radius)
 	g.player.Radius = g.nextRadius(otherMass)
 
 	go g.client.SharedGameObjects().Players.Remove(otherId)
 
 	g.client.Broadcast(message)
 
+	go g.syncPlayerBestScore()
 }
 
 func (g *InGame) handleSpore(senderId uint64, message *packets.Packet_Spore) {
@@ -255,16 +260,30 @@ func (g *InGame) validatePlayerCloseToObject(objX, objY, objRadius, buffer float
 	return nil
 }
 
-func (g *InGame) radToMass(radius float64) float64 {
+func radToMass(radius float64) float64 {
 	return math.Pi * radius * radius
 }
 
-func (g *InGame) massToRad(mass float64) float64 {
-	return math.Sqrt((mass / math.Pi))
+func massToRad(mass float64) float64 {
+	return math.Sqrt(mass / math.Pi)
 }
 
 func (g *InGame) nextRadius(massDiff float64) float64 {
-	oldMass := g.radToMass((g.player.Radius))
+	oldMass := radToMass(g.player.Radius)
 	newMass := oldMass + massDiff
-	return g.massToRad(newMass)
+	return massToRad(newMass)
+}
+
+func (g *InGame) syncPlayerBestScore() {
+	currentScore := int64(math.Round(radToMass(g.player.Radius)))
+	if currentScore > g.player.BestScore {
+		g.player.BestScore = currentScore
+		err := g.client.DbTx().Queries.UpdatePlayerBestScore(g.client.DbTx().Ctx, db.UpdatePlayerBestScoreParams{
+			ID:        g.player.DbId,
+			BestScore: g.player.BestScore,
+		})
+		if err != nil {
+			g.logger.Printf("Error updating player best score: %v", err)
+		}
+	}
 }
