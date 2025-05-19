@@ -9,11 +9,11 @@ var _scores: Array[int]
 func _ready() -> void:
 	_entry_template.hide()
 
-func set_hiscore(name: String, score: int) -> void:
+func set_hiscore(name: String, score: int, highlignt: bool = false) -> void:
 	remove_hiscore(name)
-	_add_hiscore(name, score)
+	_add_hiscore(name, score, highlignt)
 
-func _add_hiscore(name: String, score: int) -> void:
+func _add_hiscore(name: String, score: int, highlignt: bool) -> void:
 	_scores.append(score)
 	_scores.sort()
 	var pos := len(_scores) - _scores.find(score) - 1 
@@ -22,14 +22,17 @@ func _add_hiscore(name: String, score: int) -> void:
 	var name_label: Label = entry.get_child(0)
 	var score_label: Label = entry.get_child(1)
 	
-	_vbox.add_child(entry)
-	
+	_vbox.add_child(entry)	
 	_vbox.move_child(entry, pos)
 	
 	name_label.text = name
 	score_label.text = str(score)
 	
 	entry.show()
+	
+	if highlignt:
+		name_label.add_theme_color_override("font_color", Color.LIGHT_CORAL)
+		score_label.add_theme_color_override("font_color", Color.LIGHT_CORAL)
 		
 func remove_hiscore(name: String) -> void:
 	for i in range(len(_scores)):
@@ -41,3 +44,9 @@ func remove_hiscore(name: String) -> void:
 			
 			entry.free()
 			return
+			
+func clear_hiscores() -> void:
+	_scores.clear()
+	for entry in _vbox.get_children():
+		if entry != _entry_template:
+			entry.free()

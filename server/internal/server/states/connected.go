@@ -156,8 +156,8 @@ func (c *Connected) handleRegisterRequest(senderId uint64, message *packets.Pack
 
 }
 
-func (c *Connected) handleHiscoreBoardRequest(senderId uint64, message *packets.Packet_HiscoreBoardRequest) {
-	c.client.SetState(&BrowwsingHiscores{})
+func (c *Connected) handleHiscoreBoardRequest(senderId uint64, _ *packets.Packet_HiscoreBoardRequest) {
+	c.client.SetState(&BrowsingHiscores{})
 }
 
 func validateUsername(username string) error {
